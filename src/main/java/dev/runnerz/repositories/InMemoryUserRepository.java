@@ -1,9 +1,11 @@
 package dev.runnerz.repositories;
 
-import dev.runnerz.models.User;
+import tests.User;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+
 
 public class InMemoryUserRepository {
 
@@ -16,5 +18,13 @@ public class InMemoryUserRepository {
 
     public List<User> findAll() {
         return new ArrayList<>(users);
+    }
+
+
+    public User findOne(String id) {
+        return users.stream()
+                .filter(user -> user.getId().equals(id))
+                .findFirst()
+                .orElse(null);
     }
 }
