@@ -1,5 +1,7 @@
 package builders;
 
+import tests.User;
+
 public class UserBuilder {
     private String id;
     private String email;

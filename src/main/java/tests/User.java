@@ -1,4 +1,4 @@
-package builders;
+package tests;
 
 public class User {
     private String id;
@@ -6,7 +6,7 @@ public class User {
     private String username;
     private String password;
 
-    User(String id, String email, String username, String password) {
+    public User(String id, String email, String username, String password) {
         this.id = id;
         this.email = email;
         this.username = username;
