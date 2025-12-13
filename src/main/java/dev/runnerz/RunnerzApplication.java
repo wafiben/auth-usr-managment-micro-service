@@ -20,15 +20,9 @@ public class RunnerzApplication {
     }
 
     @Bean
-    CommandLineRunner run(UserRepository userRepository) {
-
-
-
+    CommandLineRunner run() {
         return args -> {
-
-            User user = new User("StartupUser", "startup@example.com", "ssss", "sss");
-            userRepository.save(user);
-            logger.info("Saved user at startup: ");
+            System.out.println("Application started!");
         };
     }
 }

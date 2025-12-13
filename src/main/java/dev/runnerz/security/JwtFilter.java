@@ -26,7 +26,6 @@ public class JwtFilter extends OncePerRequestFilter {
         this.userDetailsService = userDetailsService;
     }
 
-
     @Override
     protected void doFilterInternal(
             HttpServletRequest request,
@@ -39,7 +38,6 @@ public class JwtFilter extends OncePerRequestFilter {
         String email = null;
         String jwt = null;
 
-        // Check if header is valid: "Bearer <token>"
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             jwt = authHeader.substring(7);
             email = jwtUtil.extractEmail(jwt);

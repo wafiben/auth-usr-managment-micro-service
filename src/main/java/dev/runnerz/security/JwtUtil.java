@@ -6,18 +6,20 @@ import org.springframework.stereotype.Component;
 import java.util.Date;
 
 import io.jsonwebtoken.Jwts;
+import org.springframework.beans.factory.annotation.Value;
 
 @Component
 public class JwtUtil {
 
-    private final String SECRET = "SECRET_KEY_CHANGE_THIS";
+    @Value("${jwt.secret}")
+    private String SECRET;
 
     public String generateToken(String email) {
         return Jwts.builder()
                 .setSubject(email)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24))
-                .signWith(SignatureAlgorithm.HS256, SECRET)
+                .signWith(SignatureAlgorithm.HS512, SECRET)
                 .compact();
     }
 
