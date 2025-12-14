@@ -38,13 +38,4 @@ public class RegisterRequest {
         this.name = name;
     }
 
-    @Override
-    public String toString() {
-        return "RegisterRequest{" +
-                "email='" + email + '\'' +
-                ", name='" + name + '\'' +
-                ", username='" + username + '\'' +
-                ", password='" + password + '\'' +
-                '}';
-    }
 }

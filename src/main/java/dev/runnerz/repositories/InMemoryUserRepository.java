@@ -1,10 +1,10 @@
 package dev.runnerz.repositories;
 
 import tests.User;
+import dev.runnerz.errors.UserNotFoundException;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 
 public class InMemoryUserRepository {
@@ -20,11 +20,22 @@ public class InMemoryUserRepository {
         return new ArrayList<>(users);
     }
 
-
     public User findOne(String id) {
         return users.stream()
                 .filter(user -> user.getId().equals(id))
                 .findFirst()
-                .orElse(null);
+                .orElseThrow(UserNotFoundException::new);
+    }
+
+    public User updateUser(User user, String id) {
+        var existingUser = users.stream()
+                .filter(u -> u.getId().equals(id))
+                .findFirst()
+                .orElseThrow(UserNotFoundException::new);
+
+        users.remove(existingUser);
+        users.add(user);
+        return user;
+
     }
 }

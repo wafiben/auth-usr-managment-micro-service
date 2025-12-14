@@ -1,7 +1,5 @@
 package dev.runnerz;
 
-import dev.runnerz.models.User;
-import dev.runnerz.repositories.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
