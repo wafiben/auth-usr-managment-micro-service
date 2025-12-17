@@ -9,6 +9,7 @@ import dev.runnerz.errors.UserNotFoundException;
 import dev.runnerz.models.User;
 import dev.runnerz.repositories.UserRepository;
 import dev.runnerz.security.JwtUtil;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -20,11 +21,16 @@ public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
+    private final RabbitTemplate rabbitTemplate;
 
-    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtUtil jwtUtil) {
+    public AuthService(UserRepository userRepository,
+                       PasswordEncoder passwordEncoder,
+                       JwtUtil jwtUtil,
+                       RabbitTemplate rabbitTemplate) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtil = jwtUtil;
+        this.rabbitTemplate = rabbitTemplate;
     }
 
     public AuthResponse register(RegisterRequest request) {
@@ -40,6 +46,9 @@ public class AuthService {
 
         userRepository.save(user);
         String token = jwtUtil.generateToken(user.getEmail());
+        rabbitTemplate.convertAndSend("user.exchange", "user.registered", user.getEmail());
+
+        System.out.println("ssssss " + rabbitTemplate.getDefaultReceiveQueue());
         return new AuthResponse(token);
     }
 
