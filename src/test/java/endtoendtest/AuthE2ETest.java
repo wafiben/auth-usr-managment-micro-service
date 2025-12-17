@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.*;
         classes = RunnerzApplication.class,
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
 )
-@Transactional // automatically rolls back DB changes after each test
+@Transactional
 public class AuthE2ETest {
 
     @Autowired
