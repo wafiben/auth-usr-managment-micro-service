@@ -1,10 +1,12 @@
 package dev.runnerz.security;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -17,10 +19,11 @@ import java.io.IOException;
 
 @Component
 public class JwtFilter extends OncePerRequestFilter {
+    private static final Logger logger = LoggerFactory.getLogger(JwtFilter.class); // ADD THIS
+
     private final JwtUtil jwtUtil;
     private final UserDetailsService userDetailsService;
 
-    // Manual constructor
     public JwtFilter(JwtUtil jwtUtil, UserDetailsService userDetailsService) {
         this.jwtUtil = jwtUtil;
         this.userDetailsService = userDetailsService;
@@ -40,10 +43,17 @@ public class JwtFilter extends OncePerRequestFilter {
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             jwt = authHeader.substring(7);
-            email = jwtUtil.extractEmail(jwt);
+
+            // ====== ONLY CHANGE: WRAP THIS IN TRY-CATCH ======
+            try {
+                email = jwtUtil.extractEmail(jwt);
+            } catch (ExpiredJwtException e) {
+                logger.warn("JWT Token has expired: {}", e.getMessage());
+            } catch (Exception e) {
+                logger.error("Invalid JWT Token: {}", e.getMessage());
+            }
         }
 
-        // If we have email and user not yet authenticated
         if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
             UserDetails userDetails = userDetailsService.loadUserByUsername(email);
