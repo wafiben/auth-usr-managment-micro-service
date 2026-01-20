@@ -1,5 +1,6 @@
 package dev.runnerz.repositories;
 
+import dev.runnerz.eventservice.repositories.InMemoryEventServiceClient;
 import tests.User;
 import dev.runnerz.errors.UserNotFoundException;
 
@@ -8,11 +9,22 @@ import java.util.List;
 
 
 public class InMemoryUserRepository {
+    private InMemoryEventServiceClient eventClient;
 
     private final List<User> users = new ArrayList<>();
 
+    public InMemoryUserRepository(InMemoryEventServiceClient eventClient) {
+        this.eventClient = eventClient;
+    }
+
     public User save(User user) {
         users.add(user);
+
+        eventClient.publishUserRegistered(
+                user.getId(),
+                user.getEmail(),
+                user.getUsername()
+        );
         return user;
     }
 

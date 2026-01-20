@@ -7,8 +7,10 @@ import DTO.RegisterRequest;
 import DTO.AuthResponse;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
@@ -22,7 +24,6 @@ import static org.junit.jupiter.api.Assertions.*;
         classes = RunnerzApplication.class,
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
 )
-//@ActiveProfiles("test")
 public class UserE2ETest {
 
     @Autowired
@@ -33,6 +34,9 @@ public class UserE2ETest {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @MockBean
+    private RabbitTemplate rabbitTemplate;
 
     @AfterEach
     public void cleanup() {
@@ -68,7 +72,6 @@ public class UserE2ETest {
     public void testGetAllUsersWithAuthentication() {
         // Step 1: Register and get JWT token
         String token = registerAndGetToken("Wafi", "wafi@example.com", "wafi", "securePassword");
-
         // Step 2: Create a new user with authentication
         User newUser = new User("John Doe", "john@example.com", "johndoe", "password123");
 
@@ -84,7 +87,7 @@ public class UserE2ETest {
 
 
         ResponseEntity<List<User>> response = restTemplate.exchange(
-                "/users/",
+                "/users",
                 HttpMethod.GET,
                 request,
                 new ParameterizedTypeReference<List<User>>() {
@@ -136,7 +139,6 @@ public class UserE2ETest {
     public void testGetOneUserFailsWithAuthentication() {
         // Step 1: Register and get JWT token
         String token = registerAndGetToken("Wafi", "wafi@example.com", "wafi", "securePassword");
-
         // Step 2: Create a new user with authentication
         User newUser = new User("John Doe", "john@example.com", "johndoe", "password123");
 

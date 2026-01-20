@@ -6,8 +6,10 @@ import dev.runnerz.repositories.UserRepository;
 import DTO.RegisterRequest;
 import DTO.AuthResponse;
 import org.junit.jupiter.api.Test;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,11 +18,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+
 @SpringBootTest(
         classes = RunnerzApplication.class,
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
 )
-@Transactional // automatically rolls back DB changes after each test
+@Transactional
 public class AuthE2ETest {
 
     @Autowired
@@ -31,6 +34,9 @@ public class AuthE2ETest {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @MockBean
+    private RabbitTemplate rabbitTemplate;
 
     @Test
     public void testRegisterUser_Success() {

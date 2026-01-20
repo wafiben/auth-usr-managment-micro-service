@@ -9,8 +9,10 @@ import dev.runnerz.errors.UserNotFoundException;
 import dev.runnerz.models.User;
 import dev.runnerz.repositories.UserRepository;
 import dev.runnerz.security.JwtUtil;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.project.event_managment.events.UserRegisteredEvent;
 
 import java.util.Optional;
 
@@ -20,11 +22,16 @@ public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
+    private RabbitTemplate rabbitTemplate;
 
-    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtUtil jwtUtil) {
+    public AuthService(UserRepository userRepository,
+                       PasswordEncoder passwordEncoder,
+                       JwtUtil jwtUtil,
+                       RabbitTemplate rabbitTemplate) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtil = jwtUtil;
+        this.rabbitTemplate = rabbitTemplate;
     }
 
     public AuthResponse register(RegisterRequest request) {
@@ -34,12 +41,20 @@ public class AuthService {
             throw new UserAlreadyExistsException();
         }
 
-        User user = new User(null, request.getEmail(), request.getUsername(), passwordEncoder.encode(request.getPassword()));
+        User user = new User(request.getUsername(), request.getEmail(), request.getUsername(), passwordEncoder.encode(request.getPassword()));
 
         user.setPassword(passwordEncoder.encode(request.getPassword()));
 
-        userRepository.save(user);
+        User savedUser = userRepository.save(user);
         String token = jwtUtil.generateToken(user.getEmail());
+
+        rabbitTemplate.convertAndSend(
+                "user.event.exchange",
+                "user.registered",
+                new UserRegisteredEvent(savedUser.getId().toString(), savedUser.getEmail(), savedUser.getUsername())
+        );
+
+        rabbitTemplate.convertAndSend("test.queue", "Hello RabbitMQ Test Message!");
         return new AuthResponse(token);
     }
 

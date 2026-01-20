@@ -2,6 +2,7 @@ package dev.runnerz;
 
 import builders.UserBuilder;
 import dev.runnerz.errors.UserNotFoundException;
+import dev.runnerz.eventservice.repositories.InMemoryEventServiceClient;
 import dev.runnerz.repositories.InMemoryUserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,12 +13,13 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class UserTest {
-
     private InMemoryUserRepository userRepository;
+    private InMemoryEventServiceClient eventClient;
 
     @BeforeEach
     public void setUp() {
-        userRepository = new InMemoryUserRepository();
+        eventClient = new InMemoryEventServiceClient();
+        userRepository = new InMemoryUserRepository(eventClient);
     }
 
     @Test
