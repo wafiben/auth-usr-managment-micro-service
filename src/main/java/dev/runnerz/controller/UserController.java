@@ -1,6 +1,7 @@
 package dev.runnerz.controller;
 
 
+import dev.runnerz.errors.InvalidCredentialsException;
 import dev.runnerz.errors.UserNotFoundException;
 import dev.runnerz.models.User;
 import dev.runnerz.repositories.UserRepository;
@@ -25,7 +26,7 @@ public class UserController {
 
     @GetMapping()
     public List<User> getAllUsers() {
-        return  userRepository.findAll();
+        return userRepository.findAll();
     }
 
     @GetMapping("/{id}")

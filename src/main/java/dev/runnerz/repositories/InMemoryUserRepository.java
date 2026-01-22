@@ -9,6 +9,7 @@ import java.util.List;
 
 
 public class InMemoryUserRepository {
+
     private InMemoryEventServiceClient eventClient;
 
     private final List<User> users = new ArrayList<>();
@@ -48,6 +49,12 @@ public class InMemoryUserRepository {
         users.remove(existingUser);
         users.add(user);
         return user;
+    }
 
+    public User getProfile(String email) {
+        return users.stream()
+                .filter(user -> user.getEmail().equals(email))
+                .findFirst()
+                .orElseThrow(UserNotFoundException::new);
     }
 }
