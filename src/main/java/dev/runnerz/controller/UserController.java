@@ -1,7 +1,6 @@
 package dev.runnerz.controller;
 
 
-import dev.runnerz.errors.InvalidCredentialsException;
 import dev.runnerz.errors.UserNotFoundException;
 import dev.runnerz.models.User;
 import dev.runnerz.repositories.UserRepository;

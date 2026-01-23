@@ -10,6 +10,7 @@ import dev.runnerz.models.User;
 import dev.runnerz.repositories.UserRepository;
 import dev.runnerz.security.JwtUtil;
 import jakarta.servlet.http.HttpServletRequest;
+import org.project.event_managment.config.RabbitMQConfig;
 import org.project.event_managment.events.UserRegisteredEvent;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;

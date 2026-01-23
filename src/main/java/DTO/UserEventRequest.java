@@ -37,4 +37,13 @@ public class UserEventRequest {
     public void setUsername(String username) {
         this.username = username;
     }
+
+    @Override
+    public String toString() {
+        return "UserEventRequest{" +
+                "userId='" + userId + '\'' +
+                ", email='" + email + '\'' +
+                ", username='" + username + '\'' +
+                '}';
+    }
 }

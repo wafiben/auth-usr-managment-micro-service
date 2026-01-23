@@ -41,6 +41,7 @@ public class AuthTest {
 
         var foundUser = userRepository.findOne("1");
         assertEquals("example@example.com", foundUser.getEmail());
+        System.out.println(eventServiceClient.getEvents().get(0).toString());
     }
 
     @Test

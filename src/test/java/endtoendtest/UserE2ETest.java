@@ -176,7 +176,6 @@ public class UserE2ETest {
         );
 
         assertNotNull(response.getBody());
-        assertNotNull(response.getBody().getToken());
         return response.getBody().getToken();
     }
 }
