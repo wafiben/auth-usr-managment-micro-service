@@ -9,10 +9,11 @@ import dev.runnerz.errors.UserNotFoundException;
 import dev.runnerz.models.User;
 import dev.runnerz.repositories.UserRepository;
 import dev.runnerz.security.JwtUtil;
+import jakarta.servlet.http.HttpServletRequest;
+import org.project.event_managment.events.UserRegisteredEvent;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.project.event_managment.events.UserRegisteredEvent;
 
 import java.util.Optional;
 
@@ -23,6 +24,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
     private RabbitTemplate rabbitTemplate;
+
 
     public AuthService(UserRepository userRepository,
                        PasswordEncoder passwordEncoder,
@@ -41,7 +43,7 @@ public class AuthService {
             throw new UserAlreadyExistsException();
         }
 
-        User user = new User(request.getUsername(), request.getEmail(), request.getUsername(), passwordEncoder.encode(request.getPassword()));
+        User user = new User(request.getName(), request.getEmail(), request.getUsername(), passwordEncoder.encode(request.getPassword()));
 
         user.setPassword(passwordEncoder.encode(request.getPassword()));
 
@@ -68,5 +70,17 @@ public class AuthService {
 
         String token = jwtUtil.generateToken(user.getEmail());
         return new AuthResponse(token);
+    }
+
+    public User getProfile(HttpServletRequest request) {
+        String authHeader = request.getHeader("Authorization");
+
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            throw new RuntimeException("Missing or invalid Authorization header");
+        }
+
+        String token = authHeader.substring(7);
+        String email = jwtUtil.extractEmail(token);
+        return userRepository.findByEmail(email).orElseThrow(UserNotFoundException::new);
     }
 }

@@ -68,8 +68,9 @@ public class UserE2ETest {
         assertEquals("John Doe", response.getBody().getName());
     }
 
+
     @Test
-    public void testGetAllUsersWithAuthentication() {
+    public void testGetOneUserFailsWithAuthentication() {
         // Step 1: Register and get JWT token
         String token = registerAndGetToken("Wafi", "wafi@example.com", "wafi", "securePassword");
         // Step 2: Create a new user with authentication
@@ -77,6 +78,33 @@ public class UserE2ETest {
 
         User secondUser = new User("opa", "opa@example.com", "johndoe", "password123");
 
+
+        var user = userRepository.save(newUser);
+        var userId = user.getId();
+        userRepository.save(secondUser);
+
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(token);
+        HttpEntity<Void> request = new HttpEntity<>(headers);
+
+
+        ResponseEntity<User> response = restTemplate.exchange(
+                "/users/" + "12",
+                HttpMethod.GET,
+                request,
+                User.class
+        );
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+    }
+
+    @Test
+    public void testGetAllUsersWithAuthentication() {
+        // Step 1: Register and get JWT token
+        String token = registerAndGetToken("Wafi", "wafi@example.com", "wafi", "securePassword");
+        // Step 2: Create a new user with authentication
+        User newUser = new User("John Doe", "john@example.com", "johndoe", "password123");
+        User secondUser = new User("opa", "opa@example.com", "johndoe", "password123");
 
         userRepository.save(newUser);
         userRepository.save(secondUser);
@@ -110,7 +138,6 @@ public class UserE2ETest {
 
         User secondUser = new User("opa", "opa@example.com", "johndoe", "password123");
 
-
         var user = userRepository.save(newUser);
         var userId = user.getId();
         userRepository.save(secondUser);
@@ -132,36 +159,6 @@ public class UserE2ETest {
 
         assertNotNull(response.getBody());
         assertEquals("john@example.com", response.getBody().getEmail());
-    }
-
-
-    @Test
-    public void testGetOneUserFailsWithAuthentication() {
-        // Step 1: Register and get JWT token
-        String token = registerAndGetToken("Wafi", "wafi@example.com", "wafi", "securePassword");
-        // Step 2: Create a new user with authentication
-        User newUser = new User("John Doe", "john@example.com", "johndoe", "password123");
-
-        User secondUser = new User("opa", "opa@example.com", "johndoe", "password123");
-
-
-        var user = userRepository.save(newUser);
-        var userId = user.getId();
-        userRepository.save(secondUser);
-
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setBearerAuth(token);
-        HttpEntity<Void> request = new HttpEntity<>(headers);
-
-
-        ResponseEntity<User> response = restTemplate.exchange(
-                "/users/" + "12",
-                HttpMethod.GET,
-                request,
-                User.class
-        );
-        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
     }
 
 
